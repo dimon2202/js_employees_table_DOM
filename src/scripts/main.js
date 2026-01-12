@@ -7,7 +7,6 @@ const tbody = table.querySelector('tbody');
 let prevColumn;
 let prevRow;
 let prevOrder;
-let counterClick = 0;
 const inputs = ['name', 'position', 'office', 'age', 'salary'];
 const officeOptions = [
   { value: 'Tokyo', text: 'Tokyo' },
@@ -45,6 +44,11 @@ const sortColumn = (column, order) => {
     if (column.innerText === 'Salary') {
       a = parseSalary(a);
       b = parseSalary(b);
+    }
+
+    if (column.innerText === 'Age') {
+      a = +a;
+      b = +b;
     }
 
     if (typeof a === 'number') {
@@ -89,13 +93,11 @@ thead.addEventListener('click', (e) => {
 tbody.addEventListener('click', (e) => {
   const tr = e.target.closest('tr');
 
-  tr.className = 'active';
-
-  if (counterClick > 0) {
+  if (prevRow) {
     prevRow.className = '';
   }
 
-  counterClick++;
+  tr.className = 'active';
   prevRow = tr;
 });
 
@@ -163,7 +165,7 @@ form.addEventListener('submit', (e) => {
 
   if (
     data.get('name').length < 4 ||
-    data.get('position').length < 4 ||
+    !data.get('salary') ||
     data.get('age') < 18 ||
     data.get('age') > 90
   ) {
@@ -190,16 +192,11 @@ form.addEventListener('submit', (e) => {
   }
 });
 
-tbody.addEventListener('dblclick', (e) => {
+const editSell = (e) => {
   const td = e.target.closest('td');
   const input = document.createElement('input');
   const prevText = td.textContent;
-
-  td.textContent = '';
-  input.classList.add('cell-input');
-  td.append(input);
-
-  input.addEventListener('blur', () => {
+  const addValueToCell = () => {
     if (input.value.length === 0) {
       td.textContent = prevText;
     } else {
@@ -207,5 +204,23 @@ tbody.addEventListener('dblclick', (e) => {
     }
 
     input.remove();
+  };
+
+  td.textContent = '';
+  input.classList.add('cell-input');
+  td.append(input);
+
+  input.addEventListener('blur', () => {
+    addValueToCell();
   });
+
+  input.addEventListener('keydown', (eventInput) => {
+    if (eventInput.key === 'Enter') {
+      addValueToCell();
+    }
+  });
+};
+
+tbody.addEventListener('dblclick', (e) => {
+  editSell(e);
 });
