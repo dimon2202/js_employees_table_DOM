@@ -165,7 +165,8 @@ form.addEventListener('submit', (e) => {
 
   if (
     data.get('name').length < 4 ||
-    !data.get('salary') ||
+    data.get('salary').length < 1 ||
+    data.get('position').length < 4 ||
     data.get('age') < 18 ||
     data.get('age') > 90
   ) {
